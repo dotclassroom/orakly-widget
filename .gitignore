@@ -1,0 +1,5 @@
+# The compiled build directory
+dist/
+
+# The node packages singularity
+node_modules/

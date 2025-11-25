@@ -1,0 +1,22 @@
+{
+  "name": "orakly-widget",
+  "version": "1.0.0",
+  "main": "dist/widget.js",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "http-server -c-1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^26.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "http-server": "^14.1.1",
+    "rollup": "^4.0.0",
+    "rollup-plugin-svelte": "^7.2.2",
+    "svelte": "^5.0.0"
+  }
+}
