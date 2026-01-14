@@ -3,15 +3,19 @@
   let { uid } = $props();
 </script>
 
-<div class="widget">
+<div class="ow-container">
   <CollapsibleSidebar uid={uid} />
 </div>
 
 <style>
-  .widget {
+  .ow-container {
     font-family: Arial, sans-serif;
-    border: 1px solid #ccc;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: fixed;
+    height: 100%;
+    top: 0px;
+    right: 0px;
+    overflow: visible;
   }
   
   button {

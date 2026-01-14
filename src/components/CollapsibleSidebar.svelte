@@ -11,7 +11,6 @@
 
   function selectQuestion(index) {
     selectedQuestion = questions[index];
-    console.log('Selected Question', index, JSON.stringify(selectedQuestion));
   }
 
   function toggleSidebar() {
@@ -41,8 +40,11 @@
         questions = data.questions.map(v => { return {
           thumbnail: v.thumbnail,
           title: v.title,
+          titleSnippet: v.title.length > 60 ? v.title.substring(0, 60)+'...' : v.title,
           upVotesCount: v.upVotesCount,
           video: v.video,
+          body: v.body,
+          bodySnippet: v.body.length > 80 ? v.body.substring(0, 80)+'...' : v.body,
         }});
 
         console.log(data.questions[1]);
@@ -111,12 +113,15 @@
     background: #f8f9fa;
     box-shadow: 2px 0 5px rgba(0,0,0,0.2);
     transition: transform 0.3s ease;
-    z-index: 90;
+    z-index: 900;
   }
 
   .ow-sidebar.full {
     top: 0;
     height: 100%;
+    padding-left: 0.5rem;
+    border-top-left-radius: 1.5rem;
+    border-bottom-left-radius: 1.5rem;
   }
 
   .ow-need-help-button {
@@ -129,6 +134,14 @@
     border-bottom-left-radius: 0.5rem;
     cursor: pointer;
     writing-mode: vertical-rl;
+    overflow:hidden;
+  }
+
+  .ow-sidebar.full .ow-need-help-button {
+    background: none;
+    width: 0;
+    margin: 0;
+    padding: 0;
   }
 
   .ow-sidebar.open {
@@ -147,7 +160,7 @@
     width:15rem;
   }
   .ow-sidebar.full .ow-search-container {
-    width:20rem;
+    width:24rem;
   }
   .ow-sidebar.closed .ow-search-container { 
   }
@@ -176,7 +189,7 @@
     padding:0.5rem 0.5rem 0.25rem 0.5rem;
     display:flex;
     flex-direction:column;
-    gap: 0.5rem;
+    gap: 1rem;
     box-sizing: border-box;
     height:100%;
   }
@@ -192,7 +205,7 @@
     position:relative;
   }
   .ow-search-input { 
-    width: 18rem;
+    width: 22rem;
     padding: 0.75rem;
     padding-left: 1.25rem;
     border-radius: 0.5rem;
@@ -226,16 +239,15 @@
   .ow-sidebar.full .ow-search-results-title { display:block; }
   .ow-search-results-list {
     display: none;
+    flex-direction: column;
 
     flex-grow: 1;
     flex-shrink: 1;
-    min-height: 10rem;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    gap: 1rem;
     overflow-y:scroll;
 
   }
-  .ow-sidebar.full .ow-search-results-list { display:grid; }
+  .ow-sidebar.full .ow-search-results-list { display:flex; }
 
   .ow-search-results-placeholder {
     width: 100%;
