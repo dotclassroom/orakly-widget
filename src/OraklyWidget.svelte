@@ -1,9 +1,10 @@
 <script>
   import CollapsibleSidebar from "./components/CollapsibleSidebar.svelte";
+  let { uid } = $props();
 </script>
 
 <div class="widget">
-  <CollapsibleSidebar />
+  <CollapsibleSidebar uid={uid} />
 </div>
 
 <style>

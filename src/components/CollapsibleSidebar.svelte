@@ -1,20 +1,25 @@
 <script>
-  import exampleSearchResult from '../example-search-result'; 
   import SearchListItem from './SearchListItem.svelte';
+  import { SEARCH_URL, VIDEO_HOST } from '../config.js';
+
+  let { uid } = $props();
 
   let status = $state("closed");
   let searchTerm = $state('');
-  let questions = $state([exampleSearchResult]);
+  let questions = $state([]);
   let selectedQuestion = $state(null);
-  let sidebarRef = null;
 
-  const SEARCH_URL = `https://backend.orakly.com/api/questions/search/all`;
+  function selectQuestion(index) {
+    selectedQuestion = questions[index];
+    console.log('Selected Question', index, JSON.stringify(selectedQuestion));
+  }
 
   function toggleSidebar() {
     if (status === "closed") {
       status = "open";
     } else {
       status = "closed";
+      selectedQuestion = null;
     }
   }
 
@@ -22,12 +27,13 @@
     e.preventDefault();
     e.stopPropagation();
     status = "full";
+    selectedQuestion = null;
 
-    await fetchSearchResults()
+    await fetchSearchResults();
   }
 
   async function fetchSearchResults() {
-    const url = `${SEARCH_URL}?query=${encodeURIComponent(searchTerm)}&category=all&filterBy=RECENT`;
+    const url = `${SEARCH_URL}?query=${encodeURIComponent(searchTerm)}&category=all&filterBy=RECENT&userId=${uid}`;
     const res = await fetch(url);
     if (res.ok) {
       const data = await res.json();
@@ -36,7 +42,10 @@
           thumbnail: v.thumbnail,
           title: v.title,
           upVotesCount: v.upVotesCount,
+          video: v.video,
         }});
+
+        console.log(data.questions[1]);
       }
     } else {
       console.error(res.status, res.statusText);
@@ -44,7 +53,7 @@
   }
 </script>
  
-<div class="ow-sidebar {status}" ref={sidebarRef}>
+<div class="ow-sidebar {status}">
   <button class="ow-need-help-button" onclick={toggleSidebar}>💬 Need Help?</button>
   <div class="ow-search-container">
     <div class="ow-search-inner">
@@ -55,19 +64,33 @@
 
       <span class="ow-search-title">What are you looking for?</span>
 
-      <form class="ow-search-form" onsubmit={searchSubmit}>
-        <input class="ow-search-input" bind:value={searchTerm} name="search" type="text" placeholder="Find Answers" />
+      <form class="ow-search-form" onsubmit={ e=>{ searchSubmit(e); e.target.querySelector('[name=search]').blur(); }}>
+        <input class="ow-search-input" bind:value={searchTerm} name="search" type="text" placeholder="Find Answers"/>
         <span class="ow-search-submit">&rarr;</span>
       </form>
 
       {#if selectedQuestion}
-        <span class="ow-search-results-title">Who will win the premier league?</span>
-      
+        <span class="ow-search-results-title">{selectedQuestion.title}</span>
+        {#if selectedQuestion.video }
+          <video 
+            src={ VIDEO_HOST + selectedQuestion.video } 
+            preload="auto" 
+            autoplay="" 
+            controls="" 
+            controlslist="nodownload" 
+            style="width: 100%;"
+          >
+            <track kind="captions" />
+          </video>
+        {:else}
+          <div class="ow-search-results-placeholder"></div>
+        {/if}
+
       {:else}
 
         <div class="ow-search-results-list">
-          {#each questions as item}
-          <SearchListItem item={item}/>
+          {#each questions as item, index}
+          <SearchListItem item={item} onClicked={selectQuestion.bind(item, index)}/>
           {/each}
         </div>
 
@@ -124,7 +147,7 @@
     width:15rem;
   }
   .ow-sidebar.full .ow-search-container {
-    width:15rem;
+    width:20rem;
   }
   .ow-sidebar.closed .ow-search-container { 
   }
@@ -154,7 +177,6 @@
     display:flex;
     flex-direction:column;
     gap: 0.5rem;
-    width: 15rem;
     box-sizing: border-box;
     height:100%;
   }
@@ -170,7 +192,7 @@
     position:relative;
   }
   .ow-search-input { 
-    width: 13rem;
+    width: 18rem;
     padding: 0.75rem;
     padding-left: 1.25rem;
     border-radius: 0.5rem;
@@ -212,8 +234,14 @@
     gap: 0.5rem;
     overflow-y:scroll;
 
-    max-height: 50vmax;
   }
   .ow-sidebar.full .ow-search-results-list { display:grid; }
+
+  .ow-search-results-placeholder {
+    width: 100%;
+    height: 5rem;
+    background: linear-gradient(45deg, white 10%, #82C8AD 40%, #82C8AD 60%, white 90%);
+    border-radius: 0.5rem;
+  }
 
 </style>

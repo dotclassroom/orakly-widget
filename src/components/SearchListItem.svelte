@@ -6,19 +6,22 @@
     const thumbnail_url = thumbnail ? BASE_IMG_URL + thumbnail : null;
     const title = props.item.title;
     const upVotesCount = props.item.upVotesCount;
+
+    const onClicked = props.onClicked;
 </script>
 
-<div class="ow-search-result">
+<button class="ow-search-result" onclick={onClicked}>
     <div class="ow-search-result-thumbnail">{#if thumbnail_url}<img src={thumbnail_url} alt={title} />{/if}</div>
     <span class="ow-search-result-name">{title}</span>
     <span class="ow-search-result-likes">{upVotesCount} likes</span>
-</div>
+</button>
 
 <style>
   .ow-search-result {
     display:flex;
     flex-direction: column;
     gap: 0.5rem;
+    max-height: 11rem;
   }
   .ow-search-result-thumbnail {
     width: 100%;
