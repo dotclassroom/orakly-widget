@@ -16,6 +16,7 @@
     top: 0px;
     right: 0px;
     overflow: visible;
+    z-index:10000000000;
   }
   
   button {
