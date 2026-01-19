@@ -1,6 +1,7 @@
 <script>
   import SearchListItem from './SearchListItem.svelte';
   import { SEARCH_URL, VIDEO_HOST } from '../config.js';
+  import DescriptionSection from './DescriptionSection.svelte';
 
   let { uid } = $props();
 
@@ -45,6 +46,7 @@
           video: v.video,
           body: v.body,
           bodySnippet: v.body.length > 80 ? v.body.substring(0, 80)+'...' : v.body,
+          transcriptions: v.transcript
         }});
 
         console.log(data.questions[1]);
@@ -60,15 +62,16 @@
   <div class="ow-search-container">
     <div class="ow-search-inner">
       <div class="ow-full-header">
-        <span class="ow-full-header-title">orakly</span>
+        <span class="ow-full-header-title">Orakly</span>
         <button class="ow-full-header-close" onclick={toggleSidebar}>X</button>
       </div>
 
+      {#if !selectedQuestion}
       <span class="ow-search-title">What are you looking for?</span>
-
+      {/if}
       <form class="ow-search-form" onsubmit={ e=>{ searchSubmit(e); e.target.querySelector('[name=search]').blur(); }}>
         <input class="ow-search-input" bind:value={searchTerm} name="search" type="text" placeholder="Find Answers"/>
-        <span class="ow-search-submit">&rarr;</span>
+        <button class="ow-search-submit" onclick={e=>searchSubmit(e)}>&rarr;</button>
       </form>
 
       {#if selectedQuestion}
@@ -87,18 +90,19 @@
         {:else}
           <div class="ow-search-results-placeholder"></div>
         {/if}
-
       {:else}
-
         <div class="ow-search-results-list">
           {#each questions as item, index}
           <SearchListItem item={item} onClicked={selectQuestion.bind(item, index)}/>
           {/each}
         </div>
-
       {/if}
 
-      <span class="ow-powered-by">Powered By Orakly</span>
+      {#if selectedQuestion}
+        <DescriptionSection selectedQuestion={selectedQuestion} />
+      {/if}
+
+      <a href="https://orakly.com" class="ow-powered-by">Powered By Orakly</a>
     </div>
   </div>
 </div>
@@ -174,11 +178,13 @@
   }
   .ow-full-header-title {
     font-weight: bold;
+    font-size:1.5rem;
     color: black;
     font-variant:small-caps;
   }
   .ow-full-header-close {
     font-weight: bold;
+    font-size:1.5rem;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
     border: none;
@@ -229,10 +235,12 @@
     width: 1.7rem;
   }
   .ow-powered-by { 
-    font-size: 60%;
+    font-size: 70%;
     text-align: center;
     opacity: 0.7;
     margin-top: auto;
+    color: #4338CA;
+    text-decoration:none;
   }
 
   .ow-search-results-title { display:none; }
