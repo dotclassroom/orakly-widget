@@ -10,13 +10,14 @@
 <style>
   .ow-container {
     font-family: Arial, sans-serif;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background:none;
     position: fixed;
     height: 100%;
     top: 0px;
     right: 0px;
     overflow: visible;
     z-index:10000000000;
+    color: black;
   }
   
   button {

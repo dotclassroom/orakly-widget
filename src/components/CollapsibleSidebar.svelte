@@ -1,4 +1,5 @@
 <script>
+  import Fuse from 'fuse.js';
   import SearchListItem from './SearchListItem.svelte';
   import { SEARCH_URL, VIDEO_HOST } from '../config.js';
   import DescriptionSection from './DescriptionSection.svelte';
@@ -7,19 +8,25 @@
 
   let status = $state("closed");
   let searchTerm = $state('');
-  let questions = $state([]);
-  let selectedQuestion = $state(null);
+  let answers = $state([]);
+  let selectedAnswer = $state(null);
 
-  function selectQuestion(index) {
-    selectedQuestion = questions[index];
+  function selectAnswer(index) {
+    selectedAnswer = answers[index];
   }
 
   function toggleSidebar() {
     if (status === "closed") {
       status = "open";
+      
+      // Focus the field
+      const inputs = document.getElementsByClassName("ow-search-input");
+      const textField = inputs.length ? inputs[0] : null;
+      if (textField) textField.focus();
+
     } else {
       status = "closed";
-      selectedQuestion = null;
+      selectedAnswer = null;
     }
   }
 
@@ -27,29 +34,34 @@
     e.preventDefault();
     e.stopPropagation();
     status = "full";
-    selectedQuestion = null;
+    selectedAnswer = null;
 
     await fetchSearchResults();
   }
 
   async function fetchSearchResults() {
-    const url = `${SEARCH_URL}?query=${encodeURIComponent(searchTerm)}&category=all&filterBy=RECENT&userId=${uid}`;
+    const url = SEARCH_URL.replace(/:USERID/, uid);
+    // const url = `${SEARCH_URL}?query=${encodeURIComponent(searchTerm)}&category=all&filterBy=RECENT&userId=${uid}`;
     const res = await fetch(url);
     if (res.ok) {
       const data = await res.json();
-      if (data.questions) {
-        questions = data.questions.map(v => { return {
+      if (data.answers) {
+
+        answers = data.answers.map(v => { return {
           thumbnail: v.thumbnail,
           title: v.title,
           titleSnippet: v.title.length > 60 ? v.title.substring(0, 60)+'...' : v.title,
-          upVotesCount: v.upVotesCount,
+          upVotesCount: v.upVotes.length,
           video: v.video,
           body: v.body,
           bodySnippet: v.body.length > 80 ? v.body.substring(0, 80)+'...' : v.body,
           transcriptions: v.transcript
         }});
 
-        console.log(data.questions[1]);
+        if (searchTerm) {
+          const fuse = new Fuse(answers, { keys: ["title", "body"]});
+          answers = fuse.search(searchTerm).map(result => result.item);
+        }
       }
     } else {
       console.error(res.status, res.statusText);
@@ -58,7 +70,7 @@
 </script>
  
 <div class="ow-sidebar {status}">
-  <button class="ow-need-help-button" onclick={toggleSidebar}>💬 Need Help?</button>
+  <button class="ow-need-help-button" onclick={toggleSidebar}>🔎 Search Video FAQs</button>
   <div class="ow-search-container">
     <div class="ow-search-inner">
       <div class="ow-full-header">
@@ -66,7 +78,7 @@
         <button class="ow-full-header-close" onclick={toggleSidebar}>X</button>
       </div>
 
-      {#if !selectedQuestion}
+      {#if !selectedAnswer}
       <span class="ow-search-title">What are you looking for?</span>
       {/if}
       <form class="ow-search-form" onsubmit={ e=>{ searchSubmit(e); e.target.querySelector('[name=search]').blur(); }}>
@@ -74,11 +86,11 @@
         <button class="ow-search-submit" onclick={e=>searchSubmit(e)}>&rarr;</button>
       </form>
 
-      {#if selectedQuestion}
-        <span class="ow-search-results-title">{selectedQuestion.title}</span>
-        {#if selectedQuestion.video }
+      {#if selectedAnswer}
+        <span class="ow-search-results-title">{selectedAnswer.title}</span>
+        {#if selectedAnswer.video }
           <video 
-            src={ VIDEO_HOST + selectedQuestion.video } 
+            src={ VIDEO_HOST + selectedAnswer.video } 
             preload="auto" 
             autoplay="" 
             controls="" 
@@ -92,14 +104,16 @@
         {/if}
       {:else}
         <div class="ow-search-results-list">
-          {#each questions as item, index}
-          <SearchListItem item={item} onClicked={selectQuestion.bind(item, index)}/>
-          {/each}
+          {#key answers}
+            {#each answers as item, index}
+            <SearchListItem item={item} onClicked={selectAnswer.bind(item, index)}/>
+            {/each}
+          {/key}
         </div>
       {/if}
 
-      {#if selectedQuestion}
-        <DescriptionSection selectedQuestion={selectedQuestion} />
+      {#if selectedAnswer}
+        <DescriptionSection selectedAnswer={selectedAnswer} />
       {/if}
 
       <a href="https://orakly.com" class="ow-powered-by">Powered By Orakly</a>
@@ -114,8 +128,7 @@
     display:flex;
     top: calc(50% - 2rem);
     right: 0;
-    background: #f8f9fa;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    background: none;
     transition: transform 0.3s ease;
     z-index: 900;
   }
@@ -192,6 +205,7 @@
   }
 
   .ow-search-inner {
+    background: #f8f9fa;
     padding:0.5rem 0.5rem 0.25rem 0.5rem;
     display:flex;
     flex-direction:column;

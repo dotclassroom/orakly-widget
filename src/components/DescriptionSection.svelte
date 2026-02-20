@@ -1,6 +1,6 @@
 <script>
-  let { selectedQuestion } = $props();
-  let transcriptions = selectedQuestion.transcriptions;
+  let { selectedAnswer } = $props();
+  let transcriptions = selectedAnswer.transcriptions;
   let selectedTranscription = $state(getInitialTranscript());
   let showTranscription = $state(false);
 
@@ -45,7 +45,7 @@
   {:else}
     <div class="ow-description-body">
       <h3 class="ow-description-title">Video Description</h3>
-      {selectedQuestion.body}
+      {selectedAnswer.body}
     </div>
   {/if}
 </div>
