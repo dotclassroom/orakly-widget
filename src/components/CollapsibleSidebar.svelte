@@ -55,19 +55,37 @@
           video: v.video,
           body: v.body,
           bodySnippet: v.body.length > 80 ? v.body.substring(0, 80)+'...' : v.body,
-          transcriptions: v.transcript
+          transcriptions: v.transcript,
+          transcriptionFullText: v.transcript ? v.transcript.map(t => t.transcript || "").join(" ") : ""
         }});
 
         if (searchTerm) {
-          const fuse = new Fuse(answers, { keys: ["title", "body"]});
-          answers = fuse.search(searchTerm).map(result => result.item);
+          const fuse = new Fuse(answers, { 
+            keys: [
+              {name: "title", weight: 0.3 },
+              {name: "body", weight: 0.3 },
+              {name: "transcriptionFullText", weight: 1 }
+            ],
+            ignoreLocation: true,
+            findAllMatches: true,
+            minMatchCharLength: 3, // search requires at least 3 characters
+            includeMatches: true,
+            includeScore: true,
+
+            // how much of the search term can be different in the match
+            // EG. 0.2 means 20% of the term does not have to match
+            // Searching for "where" will match "answered" because only 1 letter is missing
+            threshold: 0.2, 
+          });
+          const searchResult = fuse.search(searchTerm);
+          answers = searchResult.map(r => r.item);
         }
       }
     } else {
       console.error(res.status, res.statusText);
     }
   }
-</script>
+</script> 
  
 <div class="ow-sidebar {status}">
   <button class="ow-need-help-button" onclick={toggleSidebar}>🔎 Search Video FAQs</button>
