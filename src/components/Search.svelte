@@ -3,6 +3,8 @@
   import { SEARCH_URL, VIDEO_HOST } from '../config.js';
   import DescriptionSection from './DescriptionSection.svelte';
   import SearchResultsList from './SearchResultsList.svelte';
+  import MagnifyIcon from './MagnifyIcon.svelte';
+  import ArrowIcon from './ArrowIcon.svelte';
 
   let {status, onSearch, uid, onClose} = $props();
 
@@ -32,7 +34,7 @@
 
     await fetchSearchResults();
   }
-  
+
   async function fetchSearchResults() {
     const url = SEARCH_URL.replace(/:USERID/, uid);
     // const url = `${SEARCH_URL}?query=${encodeURIComponent(searchTerm)}&category=all&filterBy=RECENT&userId=${uid}`;
@@ -92,8 +94,11 @@
   <span class="ow-search-title">What are you looking for?</span>
   {/if}
   <form class="ow-search-form" onsubmit={ e=>{ searchSubmit(e); e.target.querySelector('[name=search]').blur(); }}>
-    <input class="ow-search-input" bind:this={searchInputInstance} bind:value={searchTerm} name="search" type="text" placeholder="Find Answers"/>
-    <button class="ow-search-submit" onclick={e=>searchSubmit(e)}>&rarr;</button>
+    <div class="ow-search-input-group">
+      <MagnifyIcon />
+      <input class="ow-search-input" bind:this={searchInputInstance} bind:value={searchTerm} name="search" type="text" placeholder="Find Answers"/>
+      <button class="ow-search-submit" onclick={e=>searchSubmit(e)}><ArrowIcon /></button>
+    </div>
   </form>
 
   {#if selectedAnswer}
@@ -154,6 +159,10 @@
     border: none;
     background:none;
   }
+  .ow-search-input-group { 
+    display:flex;
+    width: 100%;
+  }
 
   .ow-search-title { 
     font-size: 85%;
@@ -169,12 +178,16 @@
   .ow-search-input { 
     width: 22rem;
     padding: 0.75rem;
-    padding-left: 1.25rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 5px rgba(67,56,202,0.5);
-    border:1px solid #4338CA;
-    outline-color: #4338CA;
+    padding-left: 2rem;
+    border-radius: 5rem;
+    border:1px solid rgb(165, 180, 252);
+    outline:none;
   }
+  .ow-search-input:focus {
+    box-shadow: 0 0 0 4px rgba(165, 180, 252, 0.5);
+
+  }
+
   .ow-search-submit { 
     border-radius: 2rem;
     font-size: 100%;
@@ -185,10 +198,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    right: 0.5rem;
-    top: 0.45rem;
-    height: 1.7rem;
-    width: 1.7rem;
+    border:none;
+    height:2rem;
+    width:2rem;
+    top:0.25rem;
+    right:0.5rem;
   }
   .ow-powered-by { 
     font-size: 70%;
