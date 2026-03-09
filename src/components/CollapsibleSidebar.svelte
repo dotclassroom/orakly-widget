@@ -24,6 +24,11 @@
     searchInstance.reset();
   }
 
+  // function onBack() {
+  //   status = "full";
+  //   searchInstance.focus();
+  // }
+
 </script> 
  
 <div class="ow-sidebar {status}">

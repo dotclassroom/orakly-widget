@@ -22,7 +22,10 @@
   }
 
   export function focus() {
-      if (searchInputInstance) searchInputInstance.focus();
+      if (searchInputInstance) {
+        searchInputInstance.focus();
+        searchInputInstance.select();
+      }
   }
 
   async function searchSubmit(e) {
@@ -82,12 +85,23 @@
     }
   }
 
+  function onBack() {
+    selectedAnswer = null;
+    focus();
+  }
+
 </script>
 
 <div class="ow-search-inner {status}">
   <div class="ow-full-header">
     <span class="ow-full-header-title">Orakly</span>
-    <button class="ow-full-header-close" onclick={onClose}>X</button>
+    <div class="ow-button-group">
+      {#if selectedAnswer}
+      <button class="ow-full-header-back" title="Back" onclick={onBack}><ArrowIcon /></button>
+      {/if}
+
+      <button class="ow-full-header-close" title="Close" onclick={onClose}>X</button>
+    </div>
   </div>
 
   {#if !selectedAnswer}
@@ -151,13 +165,43 @@
     color: black;
     font-variant:small-caps;
   }
-  .ow-full-header-close {
-    font-weight: bold;
-    font-size:1.5rem;
+  .ow-button-group {
+    display:flex;
+    flex-direction:row;
+    justify-content:flex-end;
+    gap:1rem;
+  }
+  .ow-full-header-back {
     cursor: pointer;
-    padding: 0.25rem 0.5rem;
+    padding: 0;
     border: none;
-    background:none;
+    background: none;
+    display: flex;
+    justify-content:center;
+    width: 2rem;
+    transform: scaleX(-1);
+    height: 2rem;
+    align-items: center;
+  }
+  .ow-full-header-back:hover {
+    background: rgba(0,0,0,0.12);
+    border-radius:2rem;
+  }
+  .ow-full-header-close {
+    cursor: pointer;
+    font-size:1.3rem;
+    justify-content:center;
+    padding: 0;
+    border: none;
+    background: none;
+    display: flex;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+  }
+  .ow-full-header-close:hover {
+    background: rgba(0,0,0,0.12);
+    border-radius:2rem;
   }
   .ow-search-input-group { 
     display:flex;

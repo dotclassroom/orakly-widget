@@ -22,16 +22,21 @@
 
     <div class="ow-button-bar">
       {#if showTranscription}
-        <select class=ow-transcription-select bind:value={selectedTranscription}>
-          {#each transcriptions as t}
-            <option value={t}>{t.language}</option>
-          {/each}
-        </select>
+        <div class="ow-lang-group">
+          <label for="ow-lang-select">Language:</label>
+          <select id="ow-lang-select" class=ow-transcription-select bind:value={selectedTranscription}>
+            {#each transcriptions as t}
+              <option value={t}>{t.language}</option>
+            {/each}
+          </select>
+        </div>
         <button class="ow-search-results-button" onclick={toggleTranscription}>Show Description</button>
       {:else}
         <button class="ow-search-results-button" onclick={toggleTranscription}>Show Transcription</button>
       {/if}
     </div>
+
+    <hr />
 
   {:else}
     <span class="ow-no-transcript">No transcriptions available</span>
@@ -58,15 +63,38 @@
     margin: 0 0 1rem 0;
     justify-content:space-between;
   }
+
+  .ow-lang-group {
+    display:flex;
+    align-items:center;
+    gap: 0.3rem;
+  }
+
+  hr { border:none; border-top:1px dashed dimgrey; }
   
-  button, select {
-    background: none;
-    border: 2px solid #4338CA;
-    color: #4338CA;
-    font-size: 1.2rem;
-    padding: 0.4rem 0.8rem;
-    border-radius: 0.5rem;
+  button {
+    background: #FBCFA0;
+    border: 2px solid white;
+    color: black;
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 2rem;
     cursor: pointer;
+    font-weight: normal;
+  }
+  button:hover {
+    border: 2px solid #FBCFA0;
+  }
+
+  select {
+    background: #FBCFA0;
+    color: black;
+    font-size: 1rem;
+    padding: 0.5rem 0.5rem;
+    cursor: pointer;
+    font-weight: normal;
+    text-transform:uppercase;
+    border-radius:2rem;
   }
 
   h3 {
